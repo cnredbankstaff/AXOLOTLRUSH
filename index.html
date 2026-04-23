@@ -315,8 +315,8 @@
     const player = {
       x: 100,
       y: 100,
-      width: 24,
-      height: 24,
+      width: 18,
+      height: 18,
       vx: 0,
       vy: 0,
       speed: 3,
@@ -409,104 +409,166 @@
           ctx.fill();
         }
 
-        // Main body (rounder, cuter)
-        ctx.fillStyle = '#ff6b9d';
+        // Kawaii axolotl - proper anatomy
+        // Long body (like actual axolotl)
+        ctx.fillStyle = '#ff99b3';
         ctx.beginPath();
-        ctx.ellipse(centerX, centerY + 1, 14, 13, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, centerY + 2, 13, 11, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Head (cute round head)
-        ctx.fillStyle = '#ff8fb3';
+        // Head with smile (rounded axolotl head)
+        ctx.fillStyle = '#ffb3cc';
         ctx.beginPath();
-        ctx.ellipse(centerX + 2, centerY - 10, 11, 12, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX + 1, centerY - 10, 10, 10, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Cute frill/feelers on top of head (fluffy)
-        ctx.fillStyle = '#ffb3d9';
-        for (let i = 0; i < 3; i++) {
-          ctx.beginPath();
-          const angle = (i - 1) * 0.3;
-          ctx.ellipse(centerX + 2 + Math.sin(angle) * 8, centerY - 22 + Math.cos(angle) * 2, 4, 6, angle, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Eyes (big and cute)
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(centerX - 2, centerY - 13, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centerX + 8, centerY - 13, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pupils (cute)
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(centerX - 1, centerY - 12, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centerX + 9, centerY - 12, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Cute mouth
-        ctx.strokeStyle = '#000';
+        // Sweet smile
+        ctx.strokeStyle = '#ff6b9d';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(centerX + 3, centerY - 4, 3, 0, Math.PI);
+        ctx.arc(centerX + 1, centerY - 6, 4, 0, Math.PI);
         ctx.stroke();
 
-        // Feathery gills (cute and fluffy)
-        ctx.strokeStyle = '#ff99c8';
-        ctx.lineWidth = 2.5;
-        for (let i = 0; i < 3; i++) {
+        // Big cute eyes
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(centerX - 3, centerY - 12, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 7, centerY - 12, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye pupils with shine
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(centerX - 3, centerY - 11, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 7, centerY - 11, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Shine in eyes
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(centerX - 2, centerY - 12, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 8, centerY - 12, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Head gills - two sections on each side (shorter and stubby)
+        ctx.strokeStyle = '#ff99b3';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        // Left side gills (top section - 2 short gills)
+        for (let i = 0; i < 2; i++) {
+          const xOffset = centerX - 7 + i * 5;
           ctx.beginPath();
-          ctx.moveTo(centerX - 13, centerY - 4 + i * 5);
-          ctx.quadraticCurveTo(centerX - 20, centerY - 2 + i * 5, centerX - 18, centerY + 3 + i * 5);
+          ctx.moveTo(xOffset, centerY - 20);
+          ctx.quadraticCurveTo(xOffset - 3, centerY - 26, xOffset - 1, centerY - 29);
           ctx.stroke();
-          
+        }
+        
+        // Left side gills (bottom section - 2 short gills)
+        for (let i = 0; i < 2; i++) {
+          const xOffset = centerX - 7 + i * 5;
           ctx.beginPath();
-          ctx.moveTo(centerX - 13, centerY - 4 + i * 5);
-          ctx.quadraticCurveTo(centerX - 18, centerY + i * 5, centerX - 16, centerY + 5 + i * 5);
+          ctx.moveTo(xOffset, centerY - 10);
+          ctx.quadraticCurveTo(xOffset - 3, centerY - 16, xOffset - 1, centerY - 19);
+          ctx.stroke();
+        }
+        
+        // Right side gills (top section - 2 short gills)
+        for (let i = 0; i < 2; i++) {
+          const xOffset = centerX + 7 - i * 5;
+          ctx.beginPath();
+          ctx.moveTo(xOffset, centerY - 20);
+          ctx.quadraticCurveTo(xOffset + 3, centerY - 26, xOffset + 1, centerY - 29);
+          ctx.stroke();
+        }
+        
+        // Right side gills (bottom section - 2 short gills)
+        for (let i = 0; i < 2; i++) {
+          const xOffset = centerX + 7 - i * 5;
+          ctx.beginPath();
+          ctx.moveTo(xOffset, centerY - 10);
+          ctx.quadraticCurveTo(xOffset + 3, centerY - 16, xOffset + 1, centerY - 19);
           ctx.stroke();
         }
 
-        // Tiny tail
-        ctx.strokeStyle = '#ff8fb3';
-        ctx.lineWidth = 3;
+        // Front legs (stubby cute axolotl legs)
+        ctx.fillStyle = '#ffb3cc';
         ctx.beginPath();
-        ctx.moveTo(centerX + 14, centerY + 3);
-        ctx.quadraticCurveTo(centerX + 22, centerY - 3, centerX + 24, centerY - 8);
+        ctx.ellipse(centerX - 7, centerY + 10, 2.5, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(centerX + 7, centerY + 10, 2.5, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Back legs (tiny)
+        ctx.beginPath();
+        ctx.ellipse(centerX - 9, centerY + 8, 2, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(centerX + 9, centerY + 8, 2, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Long flowing tail (like real axolotl)
+        ctx.strokeStyle = '#ff99b3';
+        ctx.lineWidth = 3.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(centerX + 11, centerY + 3);
+        ctx.quadraticCurveTo(centerX + 20, centerY + 1, centerX + 22, centerY - 8);
         ctx.stroke();
 
-        // Wand in hand
+        // Tail fin detail (feathery)
+        ctx.strokeStyle = '#ffb3cc';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(centerX + 16 + i * 2, centerY - 2 - i);
+          ctx.lineTo(centerX + 18 + i * 2, centerY - 6 - i);
+          ctx.stroke();
+        }
+
+        // Wand in hand (always held)
         ctx.save();
-        ctx.translate(centerX + 10, centerY - 2);
-        ctx.rotate(0.3);
+        ctx.translate(centerX + 11, centerY - 3);
+        ctx.rotate(-0.1);
         
         // Wand stick
         ctx.strokeStyle = '#8b6f47';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.lineTo(12, 8);
+        ctx.lineTo(14, 9);
         ctx.stroke();
 
-        // Wand star
+        // Wand star (glowing)
         ctx.fillStyle = '#ffdd00';
         ctx.beginPath();
         for (let i = 0; i < 5; i++) {
           const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-          const x = Math.cos(angle) * 6;
-          const y = Math.sin(angle) * 6;
+          const x = Math.cos(angle) * 7;
+          const y = Math.sin(angle) * 7;
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
         ctx.closePath();
         ctx.fill();
 
+        // Wand glow
+        ctx.fillStyle = 'rgba(255, 221, 0, 0.4)';
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.fillStyle = '#ffff00';
         ctx.beginPath();
-        ctx.arc(0, 0, 3, 0, Math.PI * 2);
+        ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.restore();
@@ -534,56 +596,66 @@
         y,
         spawnX: gameWidth / 2,
         spawnY: gameHeight / 2,
-        width: 16,
-        height: 16,
+        width: 12,
+        height: 12,
         vx: 0,
         vy: 0,
-        speed: 0.8,
-        chaseRange: 180,
-        patrolDirection: 1,
-        patrolX: x,
-        patrolY: y,
+        speed: 0.9,
+        sensorRange: 140,
+        patrolSpeed: 0.5,
+        patrolX: Math.random() * gameWidth,
+        patrolY: Math.random() * gameHeight,
         patrolTimer: 0,
         patrolChangeInterval: 200,
         detectedPlayer: false,
+
+        isPlayerSpawnZone(checkX, checkY) {
+          const level = levels[currentLevel];
+          const spawnPoint = level.playerStart;
+          const spawnRadius = 80;
+          const dx = checkX - spawnPoint.x;
+          const dy = checkY - spawnPoint.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          return dist < spawnRadius;
+        },
 
         update() {
           const dx = player.x - this.x;
           const dy = player.y - this.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          this.detectedPlayer = dist < this.chaseRange;
+          this.detectedPlayer = dist < this.sensorRange;
 
-          // Chase player if in range
-          if (this.detectedPlayer && dist > 0) {
-            this.vx += (dx / dist) * this.speed * 0.6;
-            this.vy += (dy / dist) * this.speed * 0.6;
+          if (this.detectedPlayer) {
+            // Chase player when detected
+            if (dist > 5) {
+              const dirX = dx / dist;
+              const dirY = dy / dist;
+              this.vx = dirX * this.speed;
+              this.vy = dirY * this.speed;
+            } else {
+              this.vx = 0;
+              this.vy = 0;
+            }
           } else {
-            // Patrol when not detecting player
-            this.patrolTimer++;
-            if (this.patrolTimer > this.patrolChangeInterval) {
-              this.patrolTimer = 0;
-              this.patrolX = Math.random() * (gameWidth - 200) + 100;
-              this.patrolY = Math.random() * (gameHeight - 200) + 100;
+            // Patrol when player not detected
+            this.patrolTimer--;
+            if (this.patrolTimer <= 0) {
+              this.patrolX = Math.random() * gameWidth;
+              this.patrolY = Math.random() * gameHeight;
+              this.patrolTimer = this.patrolChangeInterval;
             }
 
             const pdx = this.patrolX - this.x;
             const pdy = this.patrolY - this.y;
             const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
-            if (pdist > 15 && pdist > 0) {
-              this.vx += (pdx / pdist) * this.speed * 0.4;
-              this.vy += (pdy / pdist) * this.speed * 0.4;
+
+            if (pdist > 10) {
+              this.vx = (pdx / pdist) * this.patrolSpeed;
+              this.vy = (pdy / pdist) * this.patrolSpeed;
+            } else {
+              this.vx *= 0.9;
+              this.vy *= 0.9;
             }
-          }
-
-          // Strong drag effect for slow movement
-          this.vx *= 0.85;
-          this.vy *= 0.85;
-
-          // Limit max speed
-          const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
-          if (speed > this.speed) {
-            this.vx = (this.vx / speed) * this.speed;
-            this.vy = (this.vy / speed) * this.speed;
           }
 
           const oldX = this.x;
@@ -591,20 +663,36 @@
           this.x += this.vx;
           this.y += this.vy;
 
-          // Boundary
+          // HARD BOUNDARIES - stay on screen
           this.x = Math.max(0, Math.min(gameWidth - this.width, this.x));
           this.y = Math.max(0, Math.min(gameHeight - this.height, this.y));
 
-          // Wall collision - push back if hit
+          // Wall collision - push out smoothly
           const level = levels[currentLevel];
           for (let wall of level.walls) {
             if (this.x + this.width > wall.x &&
                 this.x < wall.x + wall.width &&
                 this.y + this.height > wall.y &&
                 this.y < wall.y + wall.height) {
-              // Push back to old position
-              this.x = oldX;
-              this.y = oldY;
+              // Calculate overlap on each side
+              const overlapLeft = (this.x + this.width) - wall.x;
+              const overlapRight = (wall.x + wall.width) - this.x;
+              const overlapTop = (this.y + this.height) - wall.y;
+              const overlapBottom = (wall.y + wall.height) - this.y;
+
+              // Push out from the smallest overlap
+              const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+              
+              if (minOverlap === overlapLeft) {
+                this.x = wall.x - this.width;
+              } else if (minOverlap === overlapRight) {
+                this.x = wall.x + wall.width;
+              } else if (minOverlap === overlapTop) {
+                this.y = wall.y - this.height;
+              } else {
+                this.y = wall.y + wall.height;
+              }
+              
               this.vx = 0;
               this.vy = 0;
               break;
@@ -629,56 +717,76 @@
           const centerX = this.x + this.width / 2;
           const centerY = this.y + this.height / 2;
 
-          // Minion aura (smaller, red-ish)
-          ctx.fillStyle = 'rgba(200, 50, 100, 0.2)';
+          // Sensor zone (faint circle showing detection range)
+          ctx.strokeStyle = this.detectedPlayer ? 'rgba(255, 100, 100, 0.25)' : 'rgba(100, 150, 255, 0.15)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
           ctx.beginPath();
-          ctx.arc(centerX, centerY, 25, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, this.sensorRange, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Minion aura
+          ctx.fillStyle = 'rgba(150, 30, 80, 0.3)';
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
           ctx.fill();
 
           // Body
           ctx.fillStyle = '#d64880';
           ctx.beginPath();
-          ctx.ellipse(centerX, centerY + 0.5, 10, 10, 0, 0, Math.PI * 2);
+          ctx.ellipse(centerX, centerY + 0.5, 7, 7, 0, 0, Math.PI * 2);
           ctx.fill();
 
           // Red outline
           ctx.strokeStyle = '#ff4488';
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.ellipse(centerX, centerY + 0.5, 10, 10, 0, 0, Math.PI * 2);
+          ctx.ellipse(centerX, centerY + 0.5, 7, 7, 0, 0, Math.PI * 2);
           ctx.stroke();
 
           // Head
           ctx.fillStyle = '#ff6b9d';
           ctx.beginPath();
-          ctx.ellipse(centerX + 1.5, centerY - 7, 8, 9, 0, 0, Math.PI * 2);
+          ctx.ellipse(centerX + 1, centerY - 5, 6, 7, 0, 0, Math.PI * 2);
           ctx.fill();
 
           // Eyes
           ctx.fillStyle = '#ff00ff';
           ctx.beginPath();
-          ctx.arc(centerX - 1, centerY - 9, 2.5, 0, Math.PI * 2);
+          ctx.arc(centerX - 1, centerY - 7, 1.5, 0, Math.PI * 2);
           ctx.fill();
           ctx.beginPath();
-          ctx.arc(centerX + 5, centerY - 9, 2.5, 0, Math.PI * 2);
+          ctx.arc(centerX + 3, centerY - 7, 1.5, 0, Math.PI * 2);
           ctx.fill();
 
-          // Small gills
+          // Head gills (2 sections on each side - tiny)
           ctx.strokeStyle = '#d64880';
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 1;
+          ctx.lineCap = 'round';
+          
           for (let i = 0; i < 2; i++) {
+            const xOffset = centerX - 1.5 + i * 2;
             ctx.beginPath();
-            ctx.moveTo(centerX - 9, centerY - 3 + i * 4);
-            ctx.quadraticCurveTo(centerX - 14, centerY - 1 + i * 4, centerX - 12, centerY + 2 + i * 4);
+            ctx.moveTo(xOffset, centerY - 12);
+            ctx.quadraticCurveTo(xOffset - 1, centerY - 15, xOffset - 0.5, centerY - 17);
+            ctx.stroke();
+          }
+          
+          for (let i = 0; i < 2; i++) {
+            const xOffset = centerX + 1.5 - i * 2;
+            ctx.beginPath();
+            ctx.moveTo(xOffset, centerY - 12);
+            ctx.quadraticCurveTo(xOffset + 1, centerY - 15, xOffset + 0.5, centerY - 17);
             ctx.stroke();
           }
 
           // Tiny tail
           ctx.strokeStyle = '#ff6b9d';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.moveTo(centerX + 10, centerY + 1);
-          ctx.quadraticCurveTo(centerX + 15, centerY - 2, centerX + 16, centerY - 4);
+          ctx.moveTo(centerX + 7, centerY);
+          ctx.quadraticCurveTo(centerX + 11, centerY - 1, centerX + 12, centerY - 2);
           ctx.stroke();
         }
       });
@@ -718,20 +826,30 @@
       y: 300,
       spawnX: 500,
       spawnY: 300,
-      width: 28,
-      height: 28,
+      width: 20,
+      height: 20,
       vx: 0,
       vy: 0,
-      speed: 0.8,
-      patrolDirection: 1,
+      speed: 1.0,
+      sensorRange: 180,
+      patrolSpeed: 0.4,
       patrolX: 500,
       patrolY: 300,
       patrolTimer: 0,
-      patrolChangeInterval: 180,
+      patrolChangeInterval: 250,
       stunned: false,
       stunnedDuration: 0,
-      sensorRange: 250,
       detectedPlayer: false,
+
+      isPlayerSpawnZone(checkX, checkY) {
+        const level = levels[currentLevel];
+        const spawnPoint = level.playerStart;
+        const spawnRadius = 80;
+        const dx = checkX - spawnPoint.x;
+        const dy = checkY - spawnPoint.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        return dist < spawnRadius;
+      },
 
       update() {
         if (this.stunned) {
@@ -742,45 +860,58 @@
           return;
         }
 
+        // Ensure patrol target exists
+        if (this.patrolX === undefined || this.patrolY === undefined) {
+          let attempts = 0;
+          do {
+            this.patrolX = Math.random() * gameWidth;
+            this.patrolY = Math.random() * gameHeight;
+            attempts++;
+          } while (this.isPlayerSpawnZone(this.patrolX, this.patrolY) && attempts < 5);
+        }
+
         // SENSOR: Detect player proximity
         const dx = player.x - this.x;
         const dy = player.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         this.detectedPlayer = dist < this.sensorRange;
 
-        // AGGRESSIVE CHASE when player detected
-        if (this.detectedPlayer && dist > 0) {
-          this.vx += (dx / dist) * this.speed * 0.6;
-          this.vy += (dy / dist) * this.speed * 0.6;
+        if (this.detectedPlayer) {
+          // Chase player when detected
+          if (dist > 5) {
+            this.vx += (dx / dist) * this.speed * 1.2;
+            this.vy += (dy / dist) * this.speed * 1.2;
+          } else {
+            this.vx *= 0.9;
+            this.vy *= 0.9;
+          }
         } else {
-          // PATROL when not detecting player
-          this.patrolTimer++;
-          if (this.patrolTimer > this.patrolChangeInterval) {
-            this.patrolTimer = 0;
-            // Pick random patrol point
-            this.patrolX = Math.random() * (gameWidth - 200) + 100;
-            this.patrolY = Math.random() * (gameHeight - 200) + 100;
+          // Patrol when player not detected
+          this.patrolTimer--;
+          if (this.patrolTimer <= 0) {
+            this.patrolX = Math.random() * gameWidth;
+            this.patrolY = Math.random() * gameHeight;
+            this.patrolTimer = this.patrolChangeInterval;
           }
 
-          // Move toward patrol point
           const pdx = this.patrolX - this.x;
           const pdy = this.patrolY - this.y;
           const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
-          if (pdist > 15 && pdist > 0) {
-            this.vx += (pdx / pdist) * this.speed * 0.4;
-            this.vy += (pdy / pdist) * this.speed * 0.4;
+
+          if (pdist > 10) {
+            this.vx += (pdx / pdist) * this.patrolSpeed * 0.5;
+            this.vy += (pdy / pdist) * this.patrolSpeed * 0.5;
           }
         }
 
-        // Strong drag effect - slow movement
+        // Apply friction and cap speed
         this.vx *= 0.85;
         this.vy *= 0.85;
 
-        // Limit max speed
         const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
-        if (speed > this.speed) {
-          this.vx = (this.vx / speed) * this.speed;
-          this.vy = (this.vy / speed) * this.speed;
+        if (speed > this.speed * 1.5) {
+          this.vx = (this.vx / speed) * this.speed * 1.5;
+          this.vy = (this.vy / speed) * this.speed * 1.5;
         }
 
         const oldX = this.x;
@@ -788,11 +919,11 @@
         this.x += this.vx;
         this.y += this.vy;
 
-        // Boundary
+        // HARD BOUNDARIES
         this.x = Math.max(0, Math.min(gameWidth - this.width, this.x));
         this.y = Math.max(0, Math.min(gameHeight - this.height, this.y));
 
-        // Wall collision - push back if hit
+        // Wall collision - push out smoothly
         const level = levels[currentLevel];
         for (let wall of level.walls) {
           if (this.x + this.width > wall.x &&
@@ -828,118 +959,172 @@
         const centerY = this.y + this.height / 2;
 
         // SENSOR RING - shows detection range
-        if (this.detectedPlayer) {
-          ctx.strokeStyle = 'rgba(255, 50, 50, 0.6)';
-          ctx.lineWidth = 2;
-          ctx.setLineDash([5, 5]);
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, this.sensorRange, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.setLineDash([]);
-        } else {
-          ctx.strokeStyle = 'rgba(100, 100, 255, 0.3)';
-          ctx.lineWidth = 1;
-          ctx.setLineDash([3, 3]);
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, this.sensorRange, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.setLineDash([]);
-        }
+        ctx.strokeStyle = this.detectedPlayer ? 'rgba(255, 50, 50, 0.35)' : 'rgba(100, 100, 255, 0.2)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, this.sensorRange, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
 
         if (this.stunned) {
           ctx.fillStyle = 'rgba(255, 200, 0, 0.5)';
           ctx.beginPath();
-          ctx.arc(centerX, centerY, 25, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, 22, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Dark aura (evil energy) - glows red when detecting
-        ctx.fillStyle = this.detectedPlayer ? 'rgba(255, 50, 50, 0.35)' : 'rgba(150, 0, 200, 0.25)';
+        // Dark evil aura
+        ctx.fillStyle = this.detectedPlayer ? 'rgba(255, 50, 50, 0.3)' : 'rgba(150, 0, 200, 0.2)';
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 45, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, 35, 0, Math.PI * 2);
         ctx.fill();
 
-        // Main body (evil but still axolotl-like)
+        // CROWN
+        ctx.fillStyle = '#ffdd00';
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY - 22, 11, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffff00';
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
+          const px = centerX + Math.cos(angle) * 11;
+          const py = centerY - 22 + Math.sin(angle) * 5;
+          ctx.beginPath();
+          ctx.ellipse(px, py - 6, 2.5, 5, angle, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.fillStyle = '#ff0000';
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
+          const px = centerX + Math.cos(angle) * 11;
+          const py = centerY - 22 + Math.sin(angle) * 5 - 6;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.fillStyle = 'rgba(255, 255, 200, 0.5)';
+        ctx.beginPath();
+        ctx.arc(centerX - 4, centerY - 24, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Main body (smaller)
         ctx.fillStyle = '#5a1a8a';
         ctx.beginPath();
-        ctx.ellipse(centerX, centerY + 1, 15, 14, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, centerY + 1.5, 11, 10, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Glowing evil outline
         ctx.strokeStyle = '#ff00ff';
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.ellipse(centerX, centerY + 1, 15, 14, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, centerY + 1.5, 11, 10, 0, 0, Math.PI * 2);
         ctx.stroke();
 
         // Evil head
         ctx.fillStyle = '#7a2aa8';
         ctx.beginPath();
-        ctx.ellipse(centerX + 2, centerY - 10, 12, 13, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX + 0.5, centerY - 9, 9, 9, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Evil frills (darker, more menacing)
+        // Evil frills
         ctx.fillStyle = '#4a0080';
         for (let i = 0; i < 3; i++) {
           ctx.beginPath();
           const angle = (i - 1) * 0.3;
-          ctx.ellipse(centerX + 2 + Math.sin(angle) * 9, centerY - 23 + Math.cos(angle) * 2, 4.5, 7, angle, 0, Math.PI * 2);
+          ctx.ellipse(centerX + 0.5 + Math.sin(angle) * 6, centerY - 19 + Math.cos(angle) * 1.5, 3.5, 5.5, angle, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Evil glowing eyes
-        ctx.fillStyle = '#ff00ff';
-        ctx.beginPath();
-        ctx.arc(centerX - 1, centerY - 13, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centerX + 9, centerY - 13, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Evil pupils (slits)
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(centerX - 1, centerY - 12, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centerX + 9, centerY - 12, 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Evil mouth (angry)
-        ctx.strokeStyle = '#ff00ff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(centerX + 3, centerY - 3, 3.5, Math.PI, 0);
-        ctx.stroke();
-
-        // Evil dark gills
+        // Head gills - feathery
         ctx.strokeStyle = '#8a3aaa';
-        ctx.lineWidth = 2.5;
-        for (let i = 0; i < 3; i++) {
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 2; i++) {
+          const xOffset = centerX - 2.5 + i * 2;
           ctx.beginPath();
-          ctx.moveTo(centerX - 14, centerY - 4 + i * 5);
-          ctx.quadraticCurveTo(centerX - 22, centerY - 2 + i * 5, centerX - 20, centerY + 3 + i * 5);
+          ctx.moveTo(xOffset, centerY - 17);
+          ctx.quadraticCurveTo(xOffset - 2, centerY - 23, xOffset - 1, centerY - 27);
           ctx.stroke();
-          
+        }
+        
+        for (let i = 0; i < 2; i++) {
+          const xOffset = centerX + 2.5 - i * 2;
           ctx.beginPath();
-          ctx.moveTo(centerX - 14, centerY - 4 + i * 5);
-          ctx.quadraticCurveTo(centerX - 20, centerY + i * 5, centerX - 17, centerY + 5 + i * 5);
+          ctx.moveTo(xOffset, centerY - 17);
+          ctx.quadraticCurveTo(xOffset + 2, centerY - 23, xOffset + 1, centerY - 27);
           ctx.stroke();
         }
 
-        // Evil tail with energy
-        ctx.strokeStyle = '#ff00ff';
-        ctx.lineWidth = 3;
+        // Evil eyes
+        ctx.fillStyle = '#ff00ff';
         ctx.beginPath();
-        ctx.moveTo(centerX + 15, centerY + 3);
-        ctx.quadraticCurveTo(centerX + 24, centerY - 5, centerX + 27, centerY - 10);
+        ctx.arc(centerX - 1.5, centerY - 11, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 5, centerY - 11, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Evil pupils
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(centerX - 1.5, centerY - 10, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 5, centerY - 10, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Evil mouth
+        ctx.strokeStyle = '#ff00ff';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centerX + 1.5, centerY - 3, 2.5, Math.PI, 0);
         ctx.stroke();
 
+        // Front legs
+        ctx.fillStyle = '#7a2aa8';
+        ctx.beginPath();
+        ctx.ellipse(centerX - 6, centerY + 9, 2, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(centerX + 6, centerY + 9, 2, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Back legs
+        ctx.beginPath();
+        ctx.ellipse(centerX - 8, centerY + 7, 1.5, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(centerX + 8, centerY + 7, 1.5, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Evil tail
+        ctx.strokeStyle = '#ff00ff';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(centerX + 10, centerY + 1.5);
+        ctx.quadraticCurveTo(centerX + 17, centerY - 2, centerX + 18, centerY - 8);
+        ctx.stroke();
+
+        // Tail fin
+        ctx.strokeStyle = '#8a3aaa';
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(centerX + 13 + i * 1.5, centerY - 2 - i);
+          ctx.lineTo(centerX + 15 + i * 1.5, centerY - 5 - i);
+          ctx.stroke();
+        }
+
         // Tail energy particles
-        ctx.fillStyle = 'rgba(255, 0, 255, 0.6)';
+        ctx.fillStyle = 'rgba(255, 0, 255, 0.5)';
         for (let i = 0; i < 2; i++) {
           ctx.beginPath();
-          ctx.arc(centerX + 20 + i * 3, centerY - 5 + Math.sin(performance.now() / 200 + i) * 2, 2, 0, Math.PI * 2);
+          ctx.arc(centerX + 16 + i * 2, centerY - 4 + Math.sin(performance.now() / 200 + i) * 1.5, 1.5, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -950,7 +1135,7 @@
     // ============================================
 
     const levels = [
-      // LEVEL 1: Enchanted Pond (Tutorial - Harder Maze)
+      // LEVEL 1: Enchanted Pond (Tutorial - Easy Maze)
       {
         name: 'Enchanted Pond',
         objective: 'Find the wand through the maze!',
@@ -1007,55 +1192,10 @@
         unlocksAbility: 'glow'
       },
 
-      // LEVEL 4: Sunken Ruins (Stun Enemy)
-      {
-        name: 'Sunken Ruins',
-        objective: 'Solve switch puzzles to escape.',
-        playerStart: { x: 100, y: 100 },
-        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
-        walls: createRuinsWalls(gameWidth, gameHeight),
-        puzzles: [
-          { type: 'switch', x: 250, y: 250, targetDoor: 0 },
-          { type: 'switch', x: gameWidth - 250, y: 250, targetDoor: 1 },
-          { type: 'door', x: gameWidth / 2 - 25, y: gameHeight / 2, width: 50, height: 80, id: 0 },
-          { type: 'door', x: gameWidth / 2 - 25, y: gameHeight - 150, width: 50, height: 80, id: 1 },
-          { type: 'goal', x: gameWidth - 100, y: gameHeight - 100 }
-        ],
-        checkpoints: [
-          { x: 100, y: 100 },
-          { x: gameWidth / 2, y: gameHeight / 2 }
-        ],
-        enemyIntensity: 0.7,
-        lighting: 'normal',
-        minions: 5,
-        unlocksAbility: 'stunEnemy'
-      },
-
-      // LEVEL 5: Chaos Labyrinth
-      {
-        name: 'Chaos Labyrinth',
-        objective: 'Survive the shifting maze!',
-        playerStart: { x: 100, y: 100 },
-        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
-        walls: createComplexMazeWalls(gameWidth, gameHeight, 70),
-        puzzles: [
-          { type: 'goal', x: gameWidth - 150, y: gameHeight - 150 }
-        ],
-        checkpoints: [
-          { x: 100, y: 100 },
-          { x: gameWidth / 2, y: gameHeight / 2 },
-          { x: gameWidth - 150, y: gameHeight / 2 }
-        ],
-        enemyIntensity: 0.9,
-        lighting: 'dark',
-        minions: 6,
-        shiftsWalls: true
-      },
-
       // FINAL LEVEL: Core of the Pond (Boss)
       {
         name: 'Core of the Pond',
-        objective: 'Defeat the evil axolotl with your wand!',
+        objective: 'Defeat the evil axolotl!',
         playerStart: { x: gameWidth / 2 - 100, y: gameHeight - 150 },
         evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
         walls: createBossArenaWalls(gameWidth, gameHeight),
@@ -1066,7 +1206,7 @@
         checkpoints: [{ x: gameWidth / 2 - 100, y: gameHeight - 150 }],
         enemyIntensity: 1.0,
         lighting: 'intense',
-        minions: 8,
+        minions: 5,
         bossLevel: true
       }
     ];
@@ -1245,8 +1385,212 @@
     }
 
     // ============================================
-    // PUZZLE SYSTEM
+    // MOVING OBSTACLES SYSTEM
     // ============================================
+
+    const movingObstacles = [];
+
+    function createMovingObstacles() {
+      movingObstacles.length = 0;
+      const level = levels[currentLevel];
+      
+      if (!level.bossLevel) return;
+
+      // Create large pond objects (lily pad, logs, rocks, etc.)
+      const obstacleTypes = [
+        { type: 'lilypad', size: 50 },
+        { type: 'log', size: 60 },
+        { type: 'rock', size: 45 },
+        { type: 'driftwood', size: 55 }
+      ];
+
+      for (let i = 0; i < 6; i++) {
+        const obstacle = obstacleTypes[i % obstacleTypes.length];
+        movingObstacles.push({
+          ...obstacle,
+          x: Math.random() * (gameWidth - 200) + 100,
+          y: Math.random() * (gameHeight - 200) + 100,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          speed: 0.5 + (currentLevel * 0.15), // Increases with level progression
+          rotation: 0,
+          rotationSpeed: (Math.random() - 0.5) * 0.05
+        });
+      }
+    }
+
+    function updateMovingObstacles() {
+      const level = levels[currentLevel];
+      if (!level.bossLevel) return;
+
+      movingObstacles.forEach(obstacle => {
+        // Update speed based on level progression
+        obstacle.speed = 0.5 + (currentLevel * 0.15);
+
+        // Random direction changes occasionally
+        if (Math.random() < 0.01) {
+          obstacle.vx = (Math.random() - 0.5) * 3;
+          obstacle.vy = (Math.random() - 0.5) * 3;
+        }
+
+        // Update position
+        obstacle.x += obstacle.vx * obstacle.speed;
+        obstacle.y += obstacle.vy * obstacle.speed;
+        obstacle.rotation += obstacle.rotationSpeed;
+
+        // Wrap around edges (whole map, not just playable area)
+        if (obstacle.x < -obstacle.size) {
+          obstacle.x = gameWidth + obstacle.size;
+        } else if (obstacle.x > gameWidth + obstacle.size) {
+          obstacle.x = -obstacle.size;
+        }
+
+        if (obstacle.y < -obstacle.size) {
+          obstacle.y = gameHeight + obstacle.size;
+        } else if (obstacle.y > gameHeight + obstacle.size) {
+          obstacle.y = -obstacle.size;
+        }
+
+        // Collision with player
+        const dx = (player.x + player.width / 2) - (obstacle.x);
+        const dy = (player.y + player.height / 2) - (obstacle.y);
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < obstacle.size / 2 + 12) {
+          respawnPlayer();
+        }
+      });
+    }
+
+    function drawMovingObstacles() {
+      const level = levels[currentLevel];
+      if (!level.bossLevel) return;
+
+      movingObstacles.forEach(obstacle => {
+        ctx.save();
+        ctx.translate(obstacle.x, obstacle.y);
+        ctx.rotate(obstacle.rotation);
+
+        if (obstacle.type === 'lilypad') {
+          // Draw lily pad
+          ctx.fillStyle = '#2d8a4d';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, obstacle.size * 0.6, obstacle.size * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#1a5a2a';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Lily flower on pad
+          ctx.fillStyle = '#ffb6d9';
+          for (let i = 0; i < 5; i++) {
+            const angle = (i / 5) * Math.PI * 2;
+            const x = Math.cos(angle) * 12;
+            const y = Math.sin(angle) * 12;
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.fillStyle = '#ffdd00';
+          ctx.beginPath();
+          ctx.arc(0, 0, 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Lily pad center detail
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+          ctx.beginPath();
+          ctx.arc(0, 0, obstacle.size * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (obstacle.type === 'log') {
+          // Draw floating log
+          ctx.fillStyle = '#8b6f47';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, obstacle.size * 0.7, obstacle.size * 0.35, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#6b4f27';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Log rings/details
+          ctx.strokeStyle = 'rgba(107, 79, 39, 0.5)';
+          ctx.lineWidth = 2;
+          for (let i = 1; i <= 3; i++) {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, obstacle.size * 0.3 * i, obstacle.size * 0.15 * i, 0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          // Moss on log
+          ctx.fillStyle = 'rgba(45, 138, 77, 0.4)';
+          ctx.beginPath();
+          ctx.ellipse(-obstacle.size * 0.2, obstacle.size * 0.15, 15, 10, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (obstacle.type === 'rock') {
+          // Draw large rock
+          ctx.fillStyle = '#7a7a7a';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, obstacle.size * 0.65, obstacle.size * 0.6, 0.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#5a5a5a';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Rock texture
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          for (let i = 0; i < 5; i++) {
+            const rx = (Math.random() - 0.5) * obstacle.size * 0.8;
+            const ry = (Math.random() - 0.5) * obstacle.size * 0.8;
+            const rsize = Math.random() * 8 + 3;
+            ctx.beginPath();
+            ctx.arc(rx, ry, rsize, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Rock highlight
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.beginPath();
+          ctx.arc(-obstacle.size * 0.2, -obstacle.size * 0.2, 15, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (obstacle.type === 'driftwood') {
+          // Draw driftwood cluster
+          ctx.fillStyle = '#9b8b6b';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, obstacle.size * 0.7, obstacle.size * 0.3, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#7b6b4b';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Driftwood branches sticking out
+          ctx.strokeStyle = '#9b8b6b';
+          ctx.lineWidth = 6;
+          ctx.lineCap = 'round';
+          for (let i = -1; i <= 1; i++) {
+            ctx.beginPath();
+            ctx.moveTo(obstacle.size * 0.2, i * 10);
+            ctx.lineTo(obstacle.size * 0.5, i * 15);
+            ctx.stroke();
+          }
+
+          // Barnacles/texture
+          ctx.fillStyle = 'rgba(100, 100, 100, 0.6)';
+          for (let i = 0; i < 6; i++) {
+            const bx = (Math.random() - 0.5) * obstacle.size * 0.8;
+            const by = (Math.random() - 0.5) * obstacle.size * 0.6;
+            ctx.beginPath();
+            ctx.arc(bx, by, 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.restore();
+      });
+    }
 
     let solvedPuzzles = {};
 
@@ -1375,6 +1719,9 @@
       if (level.minions && level.minions > 0) {
         spawnMinions(level.minions, gameWidth / 2, gameHeight / 2);
       }
+
+      // Create moving obstacles for boss level
+      createMovingObstacles();
 
       solvedPuzzles = {};
 
@@ -1667,7 +2014,7 @@
           x: Math.random() * gameWidth,
           y: Math.random() * gameHeight,
           size: Math.random() * 8 + 4,
-          color: `hsl(${Math.random() * 30 + 150}, 40%, ${Math.random() * 30 + 30}%)`
+          color: `hsl(${Math.random() * 30 + 150}, 40%, 50%)`
         });
       }
 
@@ -2017,6 +2364,7 @@
       player.update();
       evilAxolotl.update();
       updateMinions();
+      updateMovingObstacles();
       updateEnvironmentDecor();
       checkPuzzleInteraction();
 
@@ -2036,6 +2384,7 @@
 
       drawLevel();
       drawEnvironmentDecor();
+      drawMovingObstacles();
       drawMinions();
       drawMinimap();
       updateAbilityUI();
@@ -2051,5 +2400,5 @@
     showIntroModal();
     gameLoop();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f104843d29a5e39',t:'MTc3Njk4MzEwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f107511e349fd86',t:'MTc3Njk4NDk0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
