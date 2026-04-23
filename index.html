@@ -1217,23 +1217,23 @@
 
     function createEasyMazeWalls(w, h) {
       const walls = [
-        { x: 50, y: 50, width: w - 100, height: 20 },
-        { x: 50, y: h - 70, width: w - 100, height: 20 },
-        { x: 50, y: 50, width: 20, height: h - 100 },
-        { x: w - 70, y: 50, width: 20, height: h - 100 }
+        { x: 50, y: 50, width: w - 100, height: 15 },
+        { x: 50, y: h - 65, width: w - 100, height: 15 },
+        { x: 50, y: 50, width: 15, height: h - 100 },
+        { x: w - 65, y: 50, width: 15, height: h - 100 }
       ];
 
-      // Grid-based maze for easy level (wider corridors)
+      // Grid-based maze for easy level (wider corridors, thinner walls)
       const cellSize = 70;
       for (let x = 150; x < w - 100; x += cellSize) {
         for (let y = 150; y < h - 100; y += cellSize) {
-          if (Math.random() > 0.35) {
+          if (Math.random() > 0.30) {
             const isHorizontal = Math.random() > 0.5;
             walls.push({
               x: x,
               y: y,
-              width: isHorizontal ? cellSize : 28,
-              height: isHorizontal ? 28 : cellSize
+              width: isHorizontal ? cellSize : 18,
+              height: isHorizontal ? 18 : cellSize
             });
           }
         }
@@ -1243,23 +1243,23 @@
 
     function createMediumMazeWalls(w, h) {
       const walls = [
-        { x: 50, y: 50, width: w - 100, height: 20 },
-        { x: 50, y: h - 70, width: w - 100, height: 20 },
-        { x: 50, y: 50, width: 20, height: h - 100 },
-        { x: w - 70, y: 50, width: 20, height: h - 100 }
+        { x: 50, y: 50, width: w - 100, height: 15 },
+        { x: 50, y: h - 65, width: w - 100, height: 15 },
+        { x: 50, y: 50, width: 15, height: h - 100 },
+        { x: w - 65, y: 50, width: 15, height: h - 100 }
       ];
 
-      // Denser grid maze for medium level
+      // Denser grid maze for medium level with thinner walls
       const cellSize = 60;
       for (let x = 150; x < w - 100; x += cellSize) {
         for (let y = 150; y < h - 100; y += cellSize) {
-          if (Math.random() > 0.33) {
+          if (Math.random() > 0.25) {
             const isHorizontal = Math.random() > 0.5;
             walls.push({
               x: x,
               y: y,
-              width: isHorizontal ? cellSize : 26,
-              height: isHorizontal ? 26 : cellSize
+              width: isHorizontal ? cellSize : 18,
+              height: isHorizontal ? 18 : cellSize
             });
           }
         }
@@ -1295,23 +1295,23 @@
 
     function createCrystalCaveWalls(w, h) {
       const walls = [
-        { x: 50, y: 50, width: w - 100, height: 20 },
-        { x: 50, y: h - 70, width: w - 100, height: 20 },
-        { x: 50, y: 50, width: 20, height: h - 100 },
-        { x: w - 70, y: 50, width: 20, height: h - 100 }
+        { x: 50, y: 50, width: w - 100, height: 15 },
+        { x: 50, y: h - 65, width: w - 100, height: 15 },
+        { x: 50, y: 50, width: 15, height: h - 100 },
+        { x: w - 65, y: 50, width: 15, height: h - 100 }
       ];
 
-      // Harder grid maze with denser walls
+      // Harder grid maze with denser walls and thinner construction
       const cellSize = 60;
       for (let x = 150; x < w - 100; x += cellSize) {
         for (let y = 150; y < h - 100; y += cellSize) {
-          if (Math.random() > 0.35) {
+          if (Math.random() > 0.20) {
             const isHorizontal = Math.random() > 0.5;
             walls.push({
               x: x,
               y: y,
-              width: isHorizontal ? cellSize : 25,
-              height: isHorizontal ? 25 : cellSize
+              width: isHorizontal ? cellSize : 18,
+              height: isHorizontal ? 18 : cellSize
             });
           }
         }
@@ -1376,11 +1376,11 @@
 
     function createBossArenaWalls(w, h) {
       return [
-        { x: 50, y: 50, width: w - 100, height: 20 },
-        { x: 50, y: h - 70, width: w - 100, height: 20 },
-        { x: 50, y: 50, width: 20, height: h - 100 },
-        { x: w - 70, y: 50, width: 20, height: h - 100 },
-        { x: w / 2 - 200, y: h / 2 - 60, width: 400, height: 40 }
+        { x: 50, y: 50, width: w - 100, height: 15 },
+        { x: 50, y: h - 65, width: w - 100, height: 15 },
+        { x: 50, y: 50, width: 15, height: h - 100 },
+        { x: w - 65, y: 50, width: 15, height: h - 100 },
+        { x: w / 2 - 200, y: h / 2 - 50, width: 400, height: 30 }
       ];
     }
 
@@ -1648,6 +1648,72 @@
 
     const keys = {};
 
+    // ============================================
+    // TOUCH/MOBILE INPUT
+    // ============================================
+
+    const touchControls = {
+      leftPad: { x: 0, y: 0, radius: 50, active: false },
+      rightPad: { x: 0, y: 0, radius: 50, active: false },
+      dpadDirection: { x: 0, y: 0 }
+    };
+
+    let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    function setupTouchControls() {
+      if (!isMobile) return;
+
+      const canvas = document.getElementById('mainCanvas');
+      
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        for (let touch of e.touches) {
+          const rect = canvas.getBoundingClientRect();
+          const x = touch.clientX - rect.left;
+          const y = touch.clientY - rect.top;
+
+          // Left side = movement
+          if (x < gameWidth / 2) {
+            touchControls.leftPad.active = true;
+            touchControls.leftPad.x = x;
+            touchControls.leftPad.y = y;
+          }
+          // Right side = abilities
+          else {
+            touchControls.rightPad.active = true;
+            touchControls.rightPad.x = x;
+            touchControls.rightPad.y = y;
+          }
+        }
+      }, false);
+
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        for (let touch of e.touches) {
+          const rect = canvas.getBoundingClientRect();
+          const x = touch.clientX - rect.left;
+          const y = touch.clientY - rect.top;
+
+          if (x < gameWidth / 2) {
+            touchControls.leftPad.x = x;
+            touchControls.leftPad.y = y;
+          } else {
+            touchControls.rightPad.x = x;
+            touchControls.rightPad.y = y;
+          }
+        }
+      }, false);
+
+      canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 0) {
+          touchControls.leftPad.active = false;
+          touchControls.rightPad.active = false;
+          touchControls.dpadDirection = { x: 0, y: 0 };
+        }
+      }, false);
+    }
+
     window.addEventListener('keydown', (e) => {
       keys[e.key.toLowerCase()] = true;
 
@@ -1684,8 +1750,22 @@
     });
 
     function updatePlayerMovement() {
-      const inputX = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
-      const inputY = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
+      let inputX = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
+      let inputY = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
+
+      // Mobile touch controls - left pad
+      if (touchControls.leftPad.active) {
+        const centerX = gameWidth / 4;
+        const centerY = gameHeight / 2;
+        const dx = touchControls.leftPad.x - centerX;
+        const dy = touchControls.leftPad.y - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > 15) {
+          inputX = dx / dist;
+          inputY = dy / dist;
+        }
+      }
 
       const magnitude = Math.sqrt(inputX ** 2 + inputY ** 2);
       if (magnitude > 0) {
@@ -1755,6 +1835,23 @@
       player.y = checkpoint.y;
       player.vx = 0;
       player.vy = 0;
+
+      // Reset all enemies to their spawn positions
+      evilAxolotl.x = level.evilAxolotlStart.x;
+      evilAxolotl.y = level.evilAxolotlStart.y;
+      evilAxolotl.vx = 0;
+      evilAxolotl.vy = 0;
+      evilAxolotl.stunned = false;
+      evilAxolotl.patrolTimer = 0;
+
+      // Reset all minions to their spawn positions
+      minions.forEach(minion => {
+        minion.x = minion.spawnX;
+        minion.y = minion.spawnY;
+        minion.vx = 0;
+        minion.vy = 0;
+        minion.patrolTimer = 0;
+      });
     }
 
     // ============================================
@@ -2269,6 +2366,52 @@
       });
     }
 
+    function drawTouchUI() {
+      if (!isMobile || !touchControls.leftPad.active) return;
+
+      // Left pad (movement)
+      const leftCenterX = gameWidth / 4;
+      const leftCenterY = gameHeight / 2;
+      
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.15)';
+      ctx.beginPath();
+      ctx.arc(leftCenterX, leftCenterY, 50, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(0, 212, 255, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(leftCenterX, leftCenterY, 50, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(0, 255, 136, 0.6)';
+      ctx.beginPath();
+      ctx.arc(touchControls.leftPad.x, touchControls.leftPad.y, 25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Right pad (abilities) - show if active
+      if (touchControls.rightPad.active) {
+        const rightCenterX = gameWidth * 0.75;
+        const rightCenterY = gameHeight / 2;
+        
+        ctx.fillStyle = 'rgba(255, 170, 0, 0.15)';
+        ctx.beginPath();
+        ctx.arc(rightCenterX, rightCenterY, 50, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 170, 0, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(rightCenterX, rightCenterY, 50, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255, 221, 0, 0.8)';
+        ctx.beginPath();
+        ctx.arc(touchControls.rightPad.x, touchControls.rightPad.y, 25, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     function drawMinimap() {
       const scale = 0.15;
       minimapCtx.fillStyle = '#030a15';
@@ -2386,6 +2529,7 @@
       drawEnvironmentDecor();
       drawMovingObstacles();
       drawMinions();
+      drawTouchUI();
       drawMinimap();
       updateAbilityUI();
       updateTimer();
@@ -2397,8 +2541,9 @@
     // INITIALIZATION
     // ============================================
 
+    setupTouchControls();
     showIntroModal();
     gameLoop();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f107511e349fd86',t:'MTc3Njk4NDk0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f107959e348fd86',t:'MTc3Njk4NTExNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
