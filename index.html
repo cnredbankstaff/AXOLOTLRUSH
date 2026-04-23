@@ -1,0 +1,2055 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axolotl Escape</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+      overflow: hidden;
+    }
+
+    .game-container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .game-canvas {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(180deg, #0a4d7a 0%, #051f2e 100%);
+      overflow: hidden;
+      border: 3px solid #00d4ff;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3) inset;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ui-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .ui-top {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .level-info {
+      background: rgba(0, 20, 40, 0.8);
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 2px solid #00d4ff;
+      color: #00ff88;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    .minimap {
+      width: 120px;
+      height: 120px;
+      background: rgba(0, 20, 40, 0.9);
+      border: 2px solid #00d4ff;
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    }
+
+    .minimap-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .abilities-ui {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .ability-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 20, 40, 0.8);
+      border: 2px solid #00d4ff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00ff88;
+      font-weight: bold;
+      font-size: 12px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+    }
+
+    .ability-icon.locked {
+      opacity: 0.4;
+      color: #666;
+    }
+
+    .ability-icon.active {
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      border-color: #00ff88;
+    }
+
+    .cooldown-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: #00ff88;
+      width: 100%;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .interaction-prompt {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 20, 40, 0.95);
+      padding: 20px 30px;
+      border-radius: 8px;
+      border: 2px solid #ffaa00;
+      color: #ffaa00;
+      font-weight: bold;
+      text-align: center;
+      z-index: 50;
+      pointer-events: auto;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      text-align: center;
+      color: #00ff88;
+      font-weight: bold;
+    }
+
+    .modal-content {
+      max-width: 600px;
+      padding: 40px;
+      background: rgba(0, 20, 40, 0.95);
+      border: 3px solid #00d4ff;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    }
+
+    .modal-title {
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    }
+
+    .modal-text {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #00d4ff;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .modal-button {
+      padding: 12px 30px;
+      background: #00ff88;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      pointer-events: auto;
+    }
+
+    .modal-button:hover {
+      background: #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      transform: scale(1.05);
+    }
+
+    .modal-button.secondary {
+      background: #00d4ff;
+      color: #000;
+    }
+
+    .timer {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 20, 40, 0.8);
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 2px solid #ffaa00;
+      color: #ffaa00;
+      font-weight: bold;
+      font-size: 18px;
+      z-index: 100;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .particle {
+      position: absolute;
+      pointer-events: none;
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="game-container">
+   <div class="game-canvas" id="gameCanvas">
+    <canvas id="mainCanvas"></canvas>
+    <div class="ui-overlay">
+     <div class="ui-top">
+      <div class="level-info" id="levelInfo">
+       Level 1: Enchanted Pond
+      </div>
+      <div class="minimap">
+       <canvas id="minimapCanvas" class="minimap-canvas"></canvas>
+      </div>
+     </div>
+     <div class="timer hidden" id="timer">
+      00:00
+     </div>
+     <div class="abilities-ui" id="abilitiesUI"></div>
+     <div id="interactionPrompt" class="interaction-prompt hidden"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // ============================================
+    // GAME ENGINE - Axolotl Escape
+    // ============================================
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const minimapCanvas = document.getElementById('minimapCanvas');
+    const minimapCtx = minimapCanvas.getContext('2d');
+
+    let gameWidth, gameHeight;
+    let currentLevel = 0;
+    let gameState = 'playing'; // 'playing', 'levelComplete', 'gameWon', 'intro'
+    let startTime = 0;
+    let speedrunTimer = 0;
+
+    function resizeCanvas() {
+      const container = document.getElementById('gameCanvas');
+      gameWidth = container.clientWidth;
+      gameHeight = container.clientHeight;
+      canvas.width = gameWidth;
+      canvas.height = gameHeight;
+      minimapCanvas.width = 120;
+      minimapCanvas.height = 120;
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // ============================================
+    // PLAYER
+    // ============================================
+
+    const player = {
+      x: 100,
+      y: 100,
+      width: 24,
+      height: 24,
+      vx: 0,
+      vy: 0,
+      speed: 3,
+      maxSpeed: 3,
+      friction: 0.92,
+      dashCooldown: 0,
+      dashDuration: 0,
+      dashSpeed: 8,
+      glowRadius: 0,
+      abilities: {
+        dash: false,
+        glow: false,
+        stunEnemy: false
+      },
+      canInteract: false,
+      interactTarget: null,
+
+      update() {
+        // Apply friction
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+
+        // Clamp velocity
+        const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
+        if (speed > this.maxSpeed) {
+          this.vx = (this.vx / speed) * this.maxSpeed;
+          this.vy = (this.vy / speed) * this.maxSpeed;
+        }
+
+        // Update position
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Boundary check
+        this.x = Math.max(0, Math.min(gameWidth - this.width, this.x));
+        this.y = Math.max(0, Math.min(gameHeight - this.height, this.y));
+
+        // Update cooldowns
+        if (this.dashCooldown > 0) this.dashCooldown--;
+        if (this.dashDuration > 0) this.dashDuration--;
+
+        // Update glow
+        if (this.abilities.glow && currentLevel >= 2) {
+          this.glowRadius = Math.sin(performance.now() / 200) * 30 + 100;
+        } else {
+          this.glowRadius = 0;
+        }
+
+        // Check collision with walls
+        this.checkWallCollisions();
+      },
+
+      checkWallCollisions() {
+        const level = levels[currentLevel];
+        for (let wall of level.walls) {
+          if (this.x + this.width > wall.x &&
+              this.x < wall.x + wall.width &&
+              this.y + this.height > wall.y &&
+              this.y < wall.y + wall.height) {
+            // Push player out
+            const overlapLeft = (this.x + this.width) - wall.x;
+            const overlapRight = (wall.x + wall.width) - this.x;
+            const overlapTop = (this.y + this.height) - wall.y;
+            const overlapBottom = (wall.y + wall.height) - this.y;
+
+            const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+            if (minOverlap === overlapLeft) {
+              this.x = wall.x - this.width;
+            } else if (minOverlap === overlapRight) {
+              this.x = wall.x + wall.width;
+            } else if (minOverlap === overlapTop) {
+              this.y = wall.y - this.height;
+            } else {
+              this.y = wall.y + wall.height;
+            }
+          }
+        }
+      },
+
+      draw(ctx) {
+        const centerX = this.x + this.width / 2;
+        const centerY = this.y + this.height / 2;
+
+        // Glow effect
+        if (this.glowRadius > 0) {
+          ctx.fillStyle = `rgba(0, 255, 136, 0.1)`;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, this.glowRadius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Main body (rounder, cuter)
+        ctx.fillStyle = '#ff6b9d';
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY + 1, 14, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Head (cute round head)
+        ctx.fillStyle = '#ff8fb3';
+        ctx.beginPath();
+        ctx.ellipse(centerX + 2, centerY - 10, 11, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute frill/feelers on top of head (fluffy)
+        ctx.fillStyle = '#ffb3d9';
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          const angle = (i - 1) * 0.3;
+          ctx.ellipse(centerX + 2 + Math.sin(angle) * 8, centerY - 22 + Math.cos(angle) * 2, 4, 6, angle, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Eyes (big and cute)
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(centerX - 2, centerY - 13, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 8, centerY - 13, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupils (cute)
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(centerX - 1, centerY - 12, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 9, centerY - 12, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute mouth
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centerX + 3, centerY - 4, 3, 0, Math.PI);
+        ctx.stroke();
+
+        // Feathery gills (cute and fluffy)
+        ctx.strokeStyle = '#ff99c8';
+        ctx.lineWidth = 2.5;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(centerX - 13, centerY - 4 + i * 5);
+          ctx.quadraticCurveTo(centerX - 20, centerY - 2 + i * 5, centerX - 18, centerY + 3 + i * 5);
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(centerX - 13, centerY - 4 + i * 5);
+          ctx.quadraticCurveTo(centerX - 18, centerY + i * 5, centerX - 16, centerY + 5 + i * 5);
+          ctx.stroke();
+        }
+
+        // Tiny tail
+        ctx.strokeStyle = '#ff8fb3';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(centerX + 14, centerY + 3);
+        ctx.quadraticCurveTo(centerX + 22, centerY - 3, centerX + 24, centerY - 8);
+        ctx.stroke();
+
+        // Wand in hand
+        ctx.save();
+        ctx.translate(centerX + 10, centerY - 2);
+        ctx.rotate(0.3);
+        
+        // Wand stick
+        ctx.strokeStyle = '#8b6f47';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(12, 8);
+        ctx.stroke();
+
+        // Wand star
+        ctx.fillStyle = '#ffdd00';
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+          const x = Math.cos(angle) * 6;
+          const y = Math.sin(angle) * 6;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffff00';
+        ctx.beginPath();
+        ctx.arc(0, 0, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        // Dash effect
+        if (this.dashDuration > 0) {
+          ctx.strokeStyle = `rgba(0, 255, 136, ${this.dashDuration / 10})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+    };
+
+    // ============================================
+    // MINION ENEMIES
+    // ============================================
+
+    const minions = [];
+
+    function createMinion(x, y) {
+      minions.push({
+        x,
+        y,
+        spawnX: gameWidth / 2,
+        spawnY: gameHeight / 2,
+        width: 16,
+        height: 16,
+        vx: 0,
+        vy: 0,
+        speed: 0.8,
+        chaseRange: 180,
+        patrolDirection: 1,
+        patrolX: x,
+        patrolY: y,
+        patrolTimer: 0,
+        patrolChangeInterval: 200,
+        detectedPlayer: false,
+
+        update() {
+          const dx = player.x - this.x;
+          const dy = player.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          this.detectedPlayer = dist < this.chaseRange;
+
+          // Chase player if in range
+          if (this.detectedPlayer && dist > 0) {
+            this.vx += (dx / dist) * this.speed * 0.6;
+            this.vy += (dy / dist) * this.speed * 0.6;
+          } else {
+            // Patrol when not detecting player
+            this.patrolTimer++;
+            if (this.patrolTimer > this.patrolChangeInterval) {
+              this.patrolTimer = 0;
+              this.patrolX = Math.random() * (gameWidth - 200) + 100;
+              this.patrolY = Math.random() * (gameHeight - 200) + 100;
+            }
+
+            const pdx = this.patrolX - this.x;
+            const pdy = this.patrolY - this.y;
+            const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+            if (pdist > 15 && pdist > 0) {
+              this.vx += (pdx / pdist) * this.speed * 0.4;
+              this.vy += (pdy / pdist) * this.speed * 0.4;
+            }
+          }
+
+          // Strong drag effect for slow movement
+          this.vx *= 0.85;
+          this.vy *= 0.85;
+
+          // Limit max speed
+          const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
+          if (speed > this.speed) {
+            this.vx = (this.vx / speed) * this.speed;
+            this.vy = (this.vy / speed) * this.speed;
+          }
+
+          const oldX = this.x;
+          const oldY = this.y;
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // Boundary
+          this.x = Math.max(0, Math.min(gameWidth - this.width, this.x));
+          this.y = Math.max(0, Math.min(gameHeight - this.height, this.y));
+
+          // Wall collision - push back if hit
+          const level = levels[currentLevel];
+          for (let wall of level.walls) {
+            if (this.x + this.width > wall.x &&
+                this.x < wall.x + wall.width &&
+                this.y + this.height > wall.y &&
+                this.y < wall.y + wall.height) {
+              // Push back to old position
+              this.x = oldX;
+              this.y = oldY;
+              this.vx = 0;
+              this.vy = 0;
+              break;
+            }
+          }
+
+          // Check collision with player
+          if (this.x < player.x + player.width &&
+              this.x + this.width > player.x &&
+              this.y < player.y + player.height &&
+              this.y + this.height > player.y) {
+            respawnPlayer();
+            // Respawn minion to center
+            this.x = this.spawnX;
+            this.y = this.spawnY;
+            this.vx = 0;
+            this.vy = 0;
+          }
+        },
+
+        draw(ctx) {
+          const centerX = this.x + this.width / 2;
+          const centerY = this.y + this.height / 2;
+
+          // Minion aura (smaller, red-ish)
+          ctx.fillStyle = 'rgba(200, 50, 100, 0.2)';
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 25, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Body
+          ctx.fillStyle = '#d64880';
+          ctx.beginPath();
+          ctx.ellipse(centerX, centerY + 0.5, 10, 10, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Red outline
+          ctx.strokeStyle = '#ff4488';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(centerX, centerY + 0.5, 10, 10, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Head
+          ctx.fillStyle = '#ff6b9d';
+          ctx.beginPath();
+          ctx.ellipse(centerX + 1.5, centerY - 7, 8, 9, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Eyes
+          ctx.fillStyle = '#ff00ff';
+          ctx.beginPath();
+          ctx.arc(centerX - 1, centerY - 9, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(centerX + 5, centerY - 9, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Small gills
+          ctx.strokeStyle = '#d64880';
+          ctx.lineWidth = 1.5;
+          for (let i = 0; i < 2; i++) {
+            ctx.beginPath();
+            ctx.moveTo(centerX - 9, centerY - 3 + i * 4);
+            ctx.quadraticCurveTo(centerX - 14, centerY - 1 + i * 4, centerX - 12, centerY + 2 + i * 4);
+            ctx.stroke();
+          }
+
+          // Tiny tail
+          ctx.strokeStyle = '#ff6b9d';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(centerX + 10, centerY + 1);
+          ctx.quadraticCurveTo(centerX + 15, centerY - 2, centerX + 16, centerY - 4);
+          ctx.stroke();
+        }
+      });
+    }
+
+    function spawnMinions(count, centerX, centerY) {
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        const x = centerX + Math.cos(angle) * 100;
+        const y = centerY + Math.sin(angle) * 100;
+        createMinion(x, y);
+      }
+    }
+
+    function updateMinions() {
+      minions.forEach(m => m.update());
+    }
+
+    function drawMinions() {
+      minions.forEach(m => m.draw(ctx));
+    }
+
+    function removeMinionsOutOfBounds() {
+      for (let i = minions.length - 1; i >= 0; i--) {
+        if (minions[i].x < 0 || minions[i].x > gameWidth || minions[i].y < 0 || minions[i].y > gameHeight) {
+          minions.splice(i, 1);
+        }
+      }
+    }
+
+    // ============================================
+    // EVIL AXOLOTL (ENEMY AI)
+    // ============================================
+
+    const evilAxolotl = {
+      x: 500,
+      y: 300,
+      spawnX: 500,
+      spawnY: 300,
+      width: 28,
+      height: 28,
+      vx: 0,
+      vy: 0,
+      speed: 0.8,
+      patrolDirection: 1,
+      patrolX: 500,
+      patrolY: 300,
+      patrolTimer: 0,
+      patrolChangeInterval: 180,
+      stunned: false,
+      stunnedDuration: 0,
+      sensorRange: 250,
+      detectedPlayer: false,
+
+      update() {
+        if (this.stunned) {
+          this.stunnedDuration--;
+          if (this.stunnedDuration <= 0) {
+            this.stunned = false;
+          }
+          return;
+        }
+
+        // SENSOR: Detect player proximity
+        const dx = player.x - this.x;
+        const dy = player.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        this.detectedPlayer = dist < this.sensorRange;
+
+        // AGGRESSIVE CHASE when player detected
+        if (this.detectedPlayer && dist > 0) {
+          this.vx += (dx / dist) * this.speed * 0.6;
+          this.vy += (dy / dist) * this.speed * 0.6;
+        } else {
+          // PATROL when not detecting player
+          this.patrolTimer++;
+          if (this.patrolTimer > this.patrolChangeInterval) {
+            this.patrolTimer = 0;
+            // Pick random patrol point
+            this.patrolX = Math.random() * (gameWidth - 200) + 100;
+            this.patrolY = Math.random() * (gameHeight - 200) + 100;
+          }
+
+          // Move toward patrol point
+          const pdx = this.patrolX - this.x;
+          const pdy = this.patrolY - this.y;
+          const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+          if (pdist > 15 && pdist > 0) {
+            this.vx += (pdx / pdist) * this.speed * 0.4;
+            this.vy += (pdy / pdist) * this.speed * 0.4;
+          }
+        }
+
+        // Strong drag effect - slow movement
+        this.vx *= 0.85;
+        this.vy *= 0.85;
+
+        // Limit max speed
+        const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
+        if (speed > this.speed) {
+          this.vx = (this.vx / speed) * this.speed;
+          this.vy = (this.vy / speed) * this.speed;
+        }
+
+        const oldX = this.x;
+        const oldY = this.y;
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Boundary
+        this.x = Math.max(0, Math.min(gameWidth - this.width, this.x));
+        this.y = Math.max(0, Math.min(gameHeight - this.height, this.y));
+
+        // Wall collision - push back if hit
+        const level = levels[currentLevel];
+        for (let wall of level.walls) {
+          if (this.x + this.width > wall.x &&
+              this.x < wall.x + wall.width &&
+              this.y + this.height > wall.y &&
+              this.y < wall.y + wall.height) {
+            // Push back to old position
+            this.x = oldX;
+            this.y = oldY;
+            this.vx = 0;
+            this.vy = 0;
+            break;
+          }
+        }
+
+        // Check collision with player
+        if (this.x < player.x + player.width &&
+            this.x + this.width > player.x &&
+            this.y < player.y + player.height &&
+            this.y + this.height > player.y) {
+          respawnPlayer();
+          // Respawn evil axolotl to center
+          this.x = this.spawnX;
+          this.y = this.spawnY;
+          this.vx = 0;
+          this.vy = 0;
+          this.patrolTimer = 0;
+        }
+      },
+
+      draw(ctx) {
+        const centerX = this.x + this.width / 2;
+        const centerY = this.y + this.height / 2;
+
+        // SENSOR RING - shows detection range
+        if (this.detectedPlayer) {
+          ctx.strokeStyle = 'rgba(255, 50, 50, 0.6)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, this.sensorRange, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else {
+          ctx.strokeStyle = 'rgba(100, 100, 255, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, this.sensorRange, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        if (this.stunned) {
+          ctx.fillStyle = 'rgba(255, 200, 0, 0.5)';
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 25, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Dark aura (evil energy) - glows red when detecting
+        ctx.fillStyle = this.detectedPlayer ? 'rgba(255, 50, 50, 0.35)' : 'rgba(150, 0, 200, 0.25)';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Main body (evil but still axolotl-like)
+        ctx.fillStyle = '#5a1a8a';
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY + 1, 15, 14, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Glowing evil outline
+        ctx.strokeStyle = '#ff00ff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY + 1, 15, 14, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Evil head
+        ctx.fillStyle = '#7a2aa8';
+        ctx.beginPath();
+        ctx.ellipse(centerX + 2, centerY - 10, 12, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Evil frills (darker, more menacing)
+        ctx.fillStyle = '#4a0080';
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          const angle = (i - 1) * 0.3;
+          ctx.ellipse(centerX + 2 + Math.sin(angle) * 9, centerY - 23 + Math.cos(angle) * 2, 4.5, 7, angle, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Evil glowing eyes
+        ctx.fillStyle = '#ff00ff';
+        ctx.beginPath();
+        ctx.arc(centerX - 1, centerY - 13, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 9, centerY - 13, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Evil pupils (slits)
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(centerX - 1, centerY - 12, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 9, centerY - 12, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Evil mouth (angry)
+        ctx.strokeStyle = '#ff00ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX + 3, centerY - 3, 3.5, Math.PI, 0);
+        ctx.stroke();
+
+        // Evil dark gills
+        ctx.strokeStyle = '#8a3aaa';
+        ctx.lineWidth = 2.5;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(centerX - 14, centerY - 4 + i * 5);
+          ctx.quadraticCurveTo(centerX - 22, centerY - 2 + i * 5, centerX - 20, centerY + 3 + i * 5);
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(centerX - 14, centerY - 4 + i * 5);
+          ctx.quadraticCurveTo(centerX - 20, centerY + i * 5, centerX - 17, centerY + 5 + i * 5);
+          ctx.stroke();
+        }
+
+        // Evil tail with energy
+        ctx.strokeStyle = '#ff00ff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(centerX + 15, centerY + 3);
+        ctx.quadraticCurveTo(centerX + 24, centerY - 5, centerX + 27, centerY - 10);
+        ctx.stroke();
+
+        // Tail energy particles
+        ctx.fillStyle = 'rgba(255, 0, 255, 0.6)';
+        for (let i = 0; i < 2; i++) {
+          ctx.beginPath();
+          ctx.arc(centerX + 20 + i * 3, centerY - 5 + Math.sin(performance.now() / 200 + i) * 2, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    };
+
+    // ============================================
+    // LEVEL DEFINITION
+    // ============================================
+
+    const levels = [
+      // LEVEL 1: Enchanted Pond (Tutorial - Harder Maze)
+      {
+        name: 'Enchanted Pond',
+        objective: 'Find the wand through the maze!',
+        playerStart: { x: 100, y: 100 },
+        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
+        walls: createEasyMazeWalls(gameWidth, gameHeight),
+        puzzles: [
+          { type: 'wand', x: gameWidth - 150, y: gameHeight - 150 }
+        ],
+        checkpoints: [{ x: 100, y: 100 }],
+        enemyIntensity: 0.2,
+        lighting: 'bright',
+        minions: 2
+      },
+
+      // LEVEL 2: Murky Maze (Unlock Dash - Medium Difficulty)
+      {
+        name: 'Murky Maze',
+        objective: 'Escape the maze! Dash ability unlocked.',
+        playerStart: { x: 100, y: 100 },
+        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
+        walls: createMediumMazeWalls(gameWidth, gameHeight),
+        puzzles: [
+          { type: 'goal', x: gameWidth - 150, y: gameHeight - 150 }
+        ],
+        checkpoints: [
+          { x: 100, y: 100 },
+          { x: gameWidth / 2, y: gameHeight / 2 }
+        ],
+        enemyIntensity: 0.5,
+        lighting: 'dark',
+        minions: 3,
+        unlocksAbility: 'dash'
+      },
+
+      // LEVEL 3: Crystal Caves (Unlock Glow)
+      {
+        name: 'Crystal Caves',
+        objective: 'Navigate the glowing crystals. Glow ability unlocked.',
+        playerStart: { x: 100, y: 100 },
+        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
+        walls: createCrystalCaveWalls(gameWidth, gameHeight),
+        puzzles: [
+          { type: 'lightPuzzle', x: gameWidth / 2, y: gameHeight / 2 },
+          { type: 'goal', x: gameWidth - 150, y: gameHeight - 150 }
+        ],
+        checkpoints: [
+          { x: 100, y: 100 },
+          { x: gameWidth / 2, y: gameHeight / 2 }
+        ],
+        enemyIntensity: 0.6,
+        lighting: 'crystal',
+        minions: 4,
+        unlocksAbility: 'glow'
+      },
+
+      // LEVEL 4: Sunken Ruins (Stun Enemy)
+      {
+        name: 'Sunken Ruins',
+        objective: 'Solve switch puzzles to escape.',
+        playerStart: { x: 100, y: 100 },
+        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
+        walls: createRuinsWalls(gameWidth, gameHeight),
+        puzzles: [
+          { type: 'switch', x: 250, y: 250, targetDoor: 0 },
+          { type: 'switch', x: gameWidth - 250, y: 250, targetDoor: 1 },
+          { type: 'door', x: gameWidth / 2 - 25, y: gameHeight / 2, width: 50, height: 80, id: 0 },
+          { type: 'door', x: gameWidth / 2 - 25, y: gameHeight - 150, width: 50, height: 80, id: 1 },
+          { type: 'goal', x: gameWidth - 100, y: gameHeight - 100 }
+        ],
+        checkpoints: [
+          { x: 100, y: 100 },
+          { x: gameWidth / 2, y: gameHeight / 2 }
+        ],
+        enemyIntensity: 0.7,
+        lighting: 'normal',
+        minions: 5,
+        unlocksAbility: 'stunEnemy'
+      },
+
+      // LEVEL 5: Chaos Labyrinth
+      {
+        name: 'Chaos Labyrinth',
+        objective: 'Survive the shifting maze!',
+        playerStart: { x: 100, y: 100 },
+        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
+        walls: createComplexMazeWalls(gameWidth, gameHeight, 70),
+        puzzles: [
+          { type: 'goal', x: gameWidth - 150, y: gameHeight - 150 }
+        ],
+        checkpoints: [
+          { x: 100, y: 100 },
+          { x: gameWidth / 2, y: gameHeight / 2 },
+          { x: gameWidth - 150, y: gameHeight / 2 }
+        ],
+        enemyIntensity: 0.9,
+        lighting: 'dark',
+        minions: 6,
+        shiftsWalls: true
+      },
+
+      // FINAL LEVEL: Core of the Pond (Boss)
+      {
+        name: 'Core of the Pond',
+        objective: 'Defeat the evil axolotl with your wand!',
+        playerStart: { x: gameWidth / 2 - 100, y: gameHeight - 150 },
+        evilAxolotlStart: { x: gameWidth / 2, y: gameHeight / 2 },
+        walls: createBossArenaWalls(gameWidth, gameHeight),
+        puzzles: [
+          { type: 'boss', x: gameWidth / 2, y: gameHeight / 2 },
+          { type: 'goal', x: gameWidth / 2 - 40, y: 80 }
+        ],
+        checkpoints: [{ x: gameWidth / 2 - 100, y: gameHeight - 150 }],
+        enemyIntensity: 1.0,
+        lighting: 'intense',
+        minions: 8,
+        bossLevel: true
+      }
+    ];
+
+    // ============================================
+    // LEVEL GENERATORS
+    // ============================================
+
+    function createEasyMazeWalls(w, h) {
+      const walls = [
+        { x: 50, y: 50, width: w - 100, height: 20 },
+        { x: 50, y: h - 70, width: w - 100, height: 20 },
+        { x: 50, y: 50, width: 20, height: h - 100 },
+        { x: w - 70, y: 50, width: 20, height: h - 100 }
+      ];
+
+      // Grid-based maze for easy level (wider corridors)
+      const cellSize = 70;
+      for (let x = 150; x < w - 100; x += cellSize) {
+        for (let y = 150; y < h - 100; y += cellSize) {
+          if (Math.random() > 0.35) {
+            const isHorizontal = Math.random() > 0.5;
+            walls.push({
+              x: x,
+              y: y,
+              width: isHorizontal ? cellSize : 28,
+              height: isHorizontal ? 28 : cellSize
+            });
+          }
+        }
+      }
+      return walls;
+    }
+
+    function createMediumMazeWalls(w, h) {
+      const walls = [
+        { x: 50, y: 50, width: w - 100, height: 20 },
+        { x: 50, y: h - 70, width: w - 100, height: 20 },
+        { x: 50, y: 50, width: 20, height: h - 100 },
+        { x: w - 70, y: 50, width: 20, height: h - 100 }
+      ];
+
+      // Denser grid maze for medium level
+      const cellSize = 60;
+      for (let x = 150; x < w - 100; x += cellSize) {
+        for (let y = 150; y < h - 100; y += cellSize) {
+          if (Math.random() > 0.33) {
+            const isHorizontal = Math.random() > 0.5;
+            walls.push({
+              x: x,
+              y: y,
+              width: isHorizontal ? cellSize : 26,
+              height: isHorizontal ? 26 : cellSize
+            });
+          }
+        }
+      }
+      return walls;
+    }
+
+    function createMazeWalls(w, h, size) {
+      const walls = [
+        { x: 50, y: 50, width: w - 100, height: 20 },
+        { x: 50, y: h - 70, width: w - 100, height: 20 },
+        { x: 50, y: 50, width: 20, height: h - 100 },
+        { x: w - 70, y: 50, width: 20, height: h - 100 }
+      ];
+
+      // Create grid-based maze pattern (like Pinterest maze reference)
+      const cellSize = 80;
+      for (let x = 150; x < w - 100; x += cellSize * 2) {
+        for (let y = 150; y < h - 100; y += cellSize) {
+          if (Math.random() > 0.4) {
+            const isHorizontal = Math.random() > 0.5;
+            walls.push({
+              x: x,
+              y: y,
+              width: isHorizontal ? cellSize : 30,
+              height: isHorizontal ? 30 : cellSize
+            });
+          }
+        }
+      }
+      return walls;
+    }
+
+    function createCrystalCaveWalls(w, h) {
+      const walls = [
+        { x: 50, y: 50, width: w - 100, height: 20 },
+        { x: 50, y: h - 70, width: w - 100, height: 20 },
+        { x: 50, y: 50, width: 20, height: h - 100 },
+        { x: w - 70, y: 50, width: 20, height: h - 100 }
+      ];
+
+      // Harder grid maze with denser walls
+      const cellSize = 60;
+      for (let x = 150; x < w - 100; x += cellSize) {
+        for (let y = 150; y < h - 100; y += cellSize) {
+          if (Math.random() > 0.35) {
+            const isHorizontal = Math.random() > 0.5;
+            walls.push({
+              x: x,
+              y: y,
+              width: isHorizontal ? cellSize : 25,
+              height: isHorizontal ? 25 : cellSize
+            });
+          }
+        }
+      }
+      return walls;
+    }
+
+    function createRuinsWalls(w, h) {
+      const walls = [
+        { x: 50, y: 50, width: w - 100, height: 20 },
+        { x: 50, y: h - 70, width: w - 100, height: 20 },
+        { x: 50, y: 50, width: 20, height: h - 100 },
+        { x: w - 70, y: 50, width: 20, height: h - 100 }
+      ];
+
+      // Even denser grid maze
+      const cellSize = 50;
+      for (let x = 150; x < w - 100; x += cellSize) {
+        for (let y = 150; y < h - 100; y += cellSize) {
+          if (Math.random() > 0.3) {
+            const isHorizontal = Math.random() > 0.5;
+            walls.push({
+              x: x,
+              y: y,
+              width: isHorizontal ? cellSize : 20,
+              height: isHorizontal ? 20 : cellSize
+            });
+          }
+        }
+      }
+      return walls;
+    }
+
+    function createComplexMazeWalls(w, h, complexity) {
+      const walls = [];
+      const gridSize = 45;
+      
+      // Ultra dense grid maze
+      for (let x = 100; x < w - 100; x += gridSize) {
+        for (let y = 100; y < h - 100; y += gridSize) {
+          // Higher randomness = more walls
+          if (Math.random() > 0.25) {
+            walls.push({
+              x,
+              y,
+              width: gridSize * 0.85,
+              height: 18
+            });
+            if (Math.random() > 0.6) {
+              walls.push({
+                x: x + gridSize / 2,
+                y: y - 10,
+                width: 18,
+                height: gridSize
+              });
+            }
+          }
+        }
+      }
+      return walls;
+    }
+
+    function createBossArenaWalls(w, h) {
+      return [
+        { x: 50, y: 50, width: w - 100, height: 20 },
+        { x: 50, y: h - 70, width: w - 100, height: 20 },
+        { x: 50, y: 50, width: 20, height: h - 100 },
+        { x: w - 70, y: 50, width: 20, height: h - 100 },
+        { x: w / 2 - 200, y: h / 2 - 60, width: 400, height: 40 }
+      ];
+    }
+
+    // ============================================
+    // PUZZLE SYSTEM
+    // ============================================
+
+    let solvedPuzzles = {};
+
+    function checkPuzzleInteraction() {
+      const level = levels[currentLevel];
+      for (let puzzle of level.puzzles) {
+        const dx = (player.x + player.width / 2) - (puzzle.x || 0);
+        const dy = (player.y + player.height / 2) - (puzzle.y || 0);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 60) {
+          player.canInteract = true;
+          player.interactTarget = puzzle;
+          return;
+        }
+      }
+      player.canInteract = false;
+      player.interactTarget = null;
+    }
+
+    function interactWithPuzzle() {
+      if (!player.interactTarget) return;
+
+      const puzzle = player.interactTarget;
+      const key = `${currentLevel}-${puzzle.x}-${puzzle.y}`;
+
+      if (puzzle.type === 'wand') {
+        player.abilities.dash = true;
+        completeLevel();
+      } else if (puzzle.type === 'goal') {
+        completeLevel();
+      } else if (puzzle.type === 'switch') {
+        solvedPuzzles[key] = !solvedPuzzles[key];
+        if (solvedPuzzles[key]) {
+          const level = levels[currentLevel];
+          level.puzzles.forEach(p => {
+            if (p.id === puzzle.targetDoor) {
+              p.isOpen = true;
+            }
+          });
+        }
+      } else if (puzzle.type === 'lightPuzzle') {
+        player.abilities.glow = true;
+        completeLevel();
+      } else if (puzzle.type === 'boss') {
+        if (player.abilities.stunEnemy && evilAxolotl.stunned) {
+          completeLevel();
+        }
+      }
+    }
+
+    // ============================================
+    // INPUT HANDLING
+    // ============================================
+
+    const keys = {};
+
+    window.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (player.canInteract) {
+          interactWithPuzzle();
+        } else if (player.abilities.stunEnemy && keys['shift']) {
+          // Stun enemy
+          if (player.dashCooldown <= 0) {
+            evilAxolotl.stunned = true;
+            evilAxolotl.stunnedDuration = 120;
+            player.dashCooldown = 300;
+          }
+        }
+      }
+
+      if (e.key === 'Shift') {
+        e.preventDefault();
+        if (player.abilities.dash && player.dashCooldown <= 0) {
+          const speed = Math.sqrt(player.vx ** 2 + player.vy ** 2);
+          if (speed > 0) {
+            player.vx = (player.vx / speed) * player.dashSpeed;
+            player.vy = (player.vy / speed) * player.dashSpeed;
+            player.dashDuration = 10;
+            player.dashCooldown = 120;
+          }
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    function updatePlayerMovement() {
+      const inputX = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
+      const inputY = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
+
+      const magnitude = Math.sqrt(inputX ** 2 + inputY ** 2);
+      if (magnitude > 0) {
+        player.vx += (inputX / magnitude) * player.speed;
+        player.vy += (inputY / magnitude) * player.speed;
+      }
+    }
+
+    // ============================================
+    // LEVEL MANAGEMENT
+    // ============================================
+
+    function loadLevel(levelIndex) {
+      currentLevel = levelIndex;
+      const level = levels[levelIndex];
+
+      player.x = level.playerStart.x;
+      player.y = level.playerStart.y;
+      player.vx = 0;
+      player.vy = 0;
+
+      evilAxolotl.x = level.evilAxolotlStart.x;
+      evilAxolotl.y = level.evilAxolotlStart.y;
+      evilAxolotl.vx = 0;
+      evilAxolotl.vy = 0;
+      evilAxolotl.stunned = false;
+      evilAxolotl.patrolTimer = 0;
+
+      // Clear and spawn minions
+      minions.length = 0;
+      if (level.minions && level.minions > 0) {
+        spawnMinions(level.minions, gameWidth / 2, gameHeight / 2);
+      }
+
+      solvedPuzzles = {};
+
+      if (level.unlocksAbility) {
+        player.abilities[level.unlocksAbility] = true;
+      }
+
+      gameState = 'playing';
+      startTime = performance.now();
+      speedrunTimer = 0;
+
+      initializeEnvironmentDecor();
+      updateAbilityUI();
+      updateLevelInfo();
+    }
+
+    function completeLevel() {
+      if (currentLevel < levels.length - 1) {
+        currentLevel++;
+        loadLevel(currentLevel);
+      } else {
+        gameState = 'gameWon';
+        showWinModal();
+      }
+    }
+
+    function respawnPlayer() {
+      const level = levels[currentLevel];
+      const checkpoint = level.checkpoints[level.checkpoints.length - 1];
+      player.x = checkpoint.x;
+      player.y = checkpoint.y;
+      player.vx = 0;
+      player.vy = 0;
+    }
+
+    // ============================================
+    // UI UPDATES
+    // ============================================
+
+    function updateAbilityUI() {
+      const abilitiesContainer = document.getElementById('abilitiesUI');
+      abilitiesContainer.innerHTML = '';
+
+      const abilities = [
+        { key: 'dash', label: 'DASH', char: '⚡' },
+        { key: 'glow', label: 'GLOW', char: '✨' },
+        { key: 'stunEnemy', label: 'STUN', char: '⭐' }
+      ];
+
+      abilities.forEach((ability, index) => {
+        const div = document.createElement('div');
+        div.className = `ability-icon ${!player.abilities[ability.key] ? 'locked' : 'active'}`;
+        div.innerHTML = `
+          <div style="font-size: 20px;">${ability.char}</div>
+          <div style="font-size: 10px;">${ability.label}</div>
+        `;
+        if (player.abilities[ability.key]) {
+          const cooldownPct = Math.max(0, (1 - player.dashCooldown / 300) * 100);
+          if (player.dashCooldown > 0) {
+            const bar = document.createElement('div');
+            bar.className = 'cooldown-bar';
+            bar.style.width = cooldownPct + '%';
+            div.appendChild(bar);
+          }
+        }
+        abilitiesContainer.appendChild(div);
+      });
+    }
+
+    function updateLevelInfo() {
+      const level = levels[currentLevel];
+      document.getElementById('levelInfo').textContent = `${currentLevel + 1}/${levels.length} - ${level.name}`;
+    }
+
+    function updateTimer() {
+      speedrunTimer = Math.floor((performance.now() - startTime) / 1000);
+      const minutes = Math.floor(speedrunTimer / 60);
+      const seconds = speedrunTimer % 60;
+      const timerElement = document.getElementById('timer');
+      timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // ============================================
+    // DRAWING
+    // ============================================
+
+    function drawLevel() {
+      const level = levels[currentLevel];
+
+      // Outer sand/grass area
+      ctx.fillStyle = '#8b7355';
+      ctx.fillRect(0, 0, gameWidth, gameHeight);
+
+      // Light blue water/maze area
+      ctx.fillStyle = '#4db8e8';
+      ctx.fillRect(40, 40, gameWidth - 80, gameHeight - 80);
+
+      // Background gradient in maze area
+      const gradient = ctx.createLinearGradient(0, 0, 0, gameHeight);
+      if (level.lighting === 'bright') {
+        gradient.addColorStop(0, '#5ac8f0');
+        gradient.addColorStop(1, '#3da8d8');
+      } else if (level.lighting === 'dark') {
+        gradient.addColorStop(0, '#3da8d8');
+        gradient.addColorStop(1, '#2088b8');
+      } else if (level.lighting === 'crystal') {
+        gradient.addColorStop(0, '#5ac8f0');
+        gradient.addColorStop(1, '#3da8d8');
+      } else if (level.lighting === 'intense') {
+        gradient.addColorStop(0, '#4db8e8');
+        gradient.addColorStop(1, '#2088b8');
+      }
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(40, 40, gameWidth - 80, gameHeight - 80);
+
+      // Draw particles/bubbles
+      drawBubbles();
+
+      // Draw walls
+      ctx.fillStyle = '#2a5a7a';
+      ctx.strokeStyle = '#00d4ff';
+      ctx.lineWidth = 2;
+      level.walls.forEach(wall => {
+        if (wall.x && wall.y && wall.width && wall.height) {
+          ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+          ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
+        }
+      });
+
+      // Draw puzzles
+      level.puzzles.forEach(puzzle => {
+        if (puzzle.type === 'wand') {
+          drawWand(puzzle.x, puzzle.y);
+        } else if (puzzle.type === 'goal') {
+          drawGoal(puzzle.x, puzzle.y);
+        } else if (puzzle.type === 'switch') {
+          const key = `${currentLevel}-${puzzle.x}-${puzzle.y}`;
+          drawSwitch(puzzle.x, puzzle.y, solvedPuzzles[key] || false);
+        } else if (puzzle.type === 'door') {
+          if (!puzzle.isOpen) {
+            drawDoor(puzzle.x, puzzle.y, puzzle.width, puzzle.height);
+          }
+        } else if (puzzle.type === 'lightPuzzle') {
+          drawLightPuzzle(puzzle.x, puzzle.y);
+        } else if (puzzle.type === 'boss') {
+          drawBossMarker(puzzle.x, puzzle.y);
+        }
+      });
+
+      // Draw player
+      player.draw(ctx);
+
+      // Draw evil axolotl
+      evilAxolotl.draw(ctx);
+
+      // Draw glow effect from player if glow is unlocked
+      if (player.glowRadius > 0) {
+        const gradient = ctx.createRadialGradient(
+          player.x + player.width / 2, player.y + player.height / 2, player.glowRadius / 2,
+          player.x + player.width / 2, player.y + player.height / 2, player.glowRadius
+        );
+        gradient.addColorStop(0, 'rgba(0, 255, 136, 0.3)');
+        gradient.addColorStop(1, 'rgba(0, 255, 136, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(player.x + player.width / 2, player.y + player.height / 2, player.glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawWand(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(performance.now() / 1000);
+
+      ctx.strokeStyle = '#ffdd00';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-15, 0);
+      ctx.lineTo(15, 0);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffdd00';
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffff00';
+      ctx.beginPath();
+      ctx.arc(0, 0, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawGoal(x, y) {
+      ctx.fillStyle = 'rgba(0, 255, 136, 0.3)';
+      ctx.beginPath();
+      ctx.arc(x, y, 40, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#00ff88';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x, y, 40, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#00ff88';
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2 + performance.now() / 1000;
+        const px = x + Math.cos(angle) * 50;
+        const py = y + Math.sin(angle) * 50;
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawSwitch(x, y, active) {
+      ctx.fillStyle = active ? '#00ff88' : '#ff4444';
+      ctx.fillRect(x - 15, y - 15, 30, 30);
+
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 15, y - 15, 30, 30);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(active ? '✓' : '✗', x, y);
+    }
+
+    function drawDoor(x, y, w, h) {
+      ctx.fillStyle = '#8b4513';
+      ctx.fillRect(x, y, w, h);
+
+      ctx.strokeStyle = '#d4a574';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, y, w, h);
+
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.arc(x + w - 8, y + h / 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawLightPuzzle(x, y) {
+      ctx.fillStyle = 'rgba(0, 200, 255, 0.4)';
+      ctx.beginPath();
+      ctx.arc(x, y, 50, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#00d4ff';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(x, y, 20 + i * 15, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
+    function drawBossMarker(x, y) {
+      ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
+      ctx.beginPath();
+      ctx.arc(x, y, 60, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#ff00ff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x, y, 60, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // ============================================
+    // ENVIRONMENT DECOR
+    // ============================================
+
+    const environmentDecor = [];
+
+    function initializeEnvironmentDecor() {
+      environmentDecor.length = 0;
+      
+      // Add rocks scattered around (smaller and more detailed)
+      for (let i = 0; i < 25; i++) {
+        environmentDecor.push({
+          type: 'rock',
+          x: Math.random() * gameWidth,
+          y: Math.random() * gameHeight,
+          size: Math.random() * 8 + 4,
+          color: `hsl(${Math.random() * 30 + 150}, 40%, ${Math.random() * 30 + 30}%)`
+        });
+      }
+
+      // Add seaweed clumps
+      for (let i = 0; i < 12; i++) {
+        environmentDecor.push({
+          type: 'seaweed',
+          x: Math.random() * gameWidth,
+          y: Math.random() * gameHeight,
+          height: Math.random() * 40 + 25,
+          width: Math.random() * 6 + 3,
+          wave: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.02 + 0.01
+        });
+      }
+
+      // Add coral formations (smaller and more detailed)
+      for (let i = 0; i < 18; i++) {
+        environmentDecor.push({
+          type: 'coral',
+          x: Math.random() * gameWidth,
+          y: Math.random() * gameHeight,
+          size: Math.random() * 10 + 6,
+          color: `hsl(${Math.random() * 60 + 0}, 70%, ${Math.random() * 30 + 40}%)`
+        });
+      }
+
+      // Add ambient fish
+      for (let i = 0; i < 8; i++) {
+        environmentDecor.push({
+          type: 'fish',
+          x: Math.random() * gameWidth,
+          y: Math.random() * gameHeight,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 4 + 2,
+          color: `hsl(${Math.random() * 360}, 60%, 50%)`
+        });
+      }
+    }
+
+    function updateEnvironmentDecor() {
+      environmentDecor.forEach(decor => {
+        if (decor.type === 'seaweed') {
+          decor.wave += decor.speed;
+        } else if (decor.type === 'fish') {
+          decor.x += decor.vx;
+          decor.y += decor.vy;
+
+          // Bounce off walls
+          if (decor.x < 0 || decor.x > gameWidth) decor.vx *= -1;
+          if (decor.y < 0 || decor.y > gameHeight) decor.vy *= -1;
+
+          // Keep in bounds
+          decor.x = Math.max(0, Math.min(gameWidth, decor.x));
+          decor.y = Math.max(0, Math.min(gameHeight, decor.y));
+
+          // Occasionally change direction
+          if (Math.random() < 0.01) {
+            decor.vx = (Math.random() - 0.5) * 0.8;
+            decor.vy = (Math.random() - 0.5) * 0.8;
+          }
+        }
+      });
+    }
+
+    function drawEnvironmentDecor() {
+      environmentDecor.forEach(decor => {
+        if (decor.type === 'rock') {
+          // Draw tiny detailed rocks with shading
+          ctx.fillStyle = decor.color;
+          ctx.beginPath();
+          ctx.ellipse(decor.x, decor.y, decor.size, decor.size * 0.7, Math.random() * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Rock details
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+
+          // Small highlight for detail
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+          ctx.beginPath();
+          ctx.arc(decor.x - decor.size * 0.3, decor.y - decor.size * 0.2, decor.size * 0.2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (decor.type === 'seaweed') {
+          // Draw seaweed waving with more detail
+          ctx.strokeStyle = 'rgba(34, 139, 70, 0.6)';
+          ctx.lineWidth = decor.width;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.beginPath();
+          ctx.moveTo(decor.x, decor.y);
+
+          let curX = decor.x;
+          let curY = decor.y;
+          const segments = 10;
+          for (let i = 1; i <= segments; i++) {
+            const progress = i / segments;
+            curX = decor.x + Math.sin(decor.wave + i * 0.3) * 8;
+            curY = decor.y + (decor.height * progress);
+            ctx.lineTo(curX, curY);
+          }
+          ctx.stroke();
+
+          // Seaweed leaf detail on second pass
+          ctx.strokeStyle = 'rgba(34, 139, 70, 0.4)';
+          ctx.lineWidth = decor.width * 0.6;
+          for (let i = 1; i <= segments; i++) {
+            const progress = i / segments;
+            const angle = decor.wave + i * 0.3;
+            const x = decor.x + Math.sin(angle) * 8;
+            const y = decor.y + (decor.height * progress);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + Math.cos(angle) * 4, y + 3);
+            ctx.stroke();
+          }
+        } else if (decor.type === 'coral') {
+          // Draw detailed coral with bumps
+          ctx.fillStyle = decor.color;
+          ctx.globalAlpha = 0.7;
+          
+          // Main body
+          ctx.beginPath();
+          ctx.arc(decor.x, decor.y, decor.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Coral branch bumps for detail
+          ctx.fillStyle = decor.color;
+          for (let i = 0; i < 7; i++) {
+            const angle = (i / 7) * Math.PI * 2;
+            const px = decor.x + Math.cos(angle) * decor.size * 0.5;
+            const py = decor.y + Math.sin(angle) * decor.size * 0.5;
+            ctx.beginPath();
+            ctx.arc(px, py, decor.size * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tiny bumps on coral
+            const bumpSize = decor.size * 0.15;
+            ctx.beginPath();
+            ctx.arc(px + Math.cos(angle) * bumpSize, py + Math.sin(angle) * bumpSize, bumpSize, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Coral highlight
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.beginPath();
+          ctx.arc(decor.x - decor.size * 0.3, decor.y - decor.size * 0.3, decor.size * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.globalAlpha = 1.0;
+        } else if (decor.type === 'fish') {
+          // Draw small detailed ambient fish
+          ctx.save();
+          ctx.translate(decor.x, decor.y);
+
+          // Determine direction
+          const direction = decor.vx > 0 ? 1 : -1;
+          if (direction < 0) ctx.scale(-1, 1);
+
+          // Fish shadow for depth
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+          ctx.beginPath();
+          ctx.ellipse(0.5, 0.5, decor.size * 0.9, decor.size * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Fish body with gradient-like effect
+          ctx.fillStyle = decor.color;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, decor.size, decor.size * 0.6, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Fish belly lighter
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+          ctx.beginPath();
+          ctx.ellipse(0, decor.size * 0.2, decor.size * 0.8, decor.size * 0.3, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Fish tail with detail
+          ctx.fillStyle = decor.color;
+          ctx.beginPath();
+          ctx.moveTo(decor.size, 0);
+          ctx.lineTo(decor.size + decor.size * 0.8, -decor.size * 0.5);
+          ctx.lineTo(decor.size + decor.size * 0.8, decor.size * 0.5);
+          ctx.closePath();
+          ctx.fill();
+
+          // Tail fin lines
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(decor.size + decor.size * 0.3, -decor.size * 0.3);
+          ctx.lineTo(decor.size + decor.size * 0.8, -decor.size * 0.5);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(decor.size + decor.size * 0.3, decor.size * 0.3);
+          ctx.lineTo(decor.size + decor.size * 0.8, decor.size * 0.5);
+          ctx.stroke();
+
+          // Fish eye
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(-decor.size * 0.3, -decor.size * 0.1, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Eye pupil
+          ctx.fillStyle = '#000';
+          ctx.beginPath();
+          ctx.arc(-decor.size * 0.25, -decor.size * 0.1, 0.6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Fins detail
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(-decor.size * 0.2, -decor.size * 0.5);
+          ctx.lineTo(-decor.size * 0.3, -decor.size * 0.9);
+          ctx.stroke();
+
+          ctx.restore();
+        }
+      });
+    }
+
+    const bubbles = [];
+
+    function drawBubbles() {
+      if (Math.random() < 0.1) {
+        bubbles.push({
+          x: Math.random() * gameWidth,
+          y: gameHeight,
+          radius: Math.random() * 3 + 1,
+          speed: Math.random() * 1 + 0.5,
+          opacity: 0.4
+        });
+      }
+
+      bubbles.forEach((bubble, i) => {
+        bubble.y -= bubble.speed;
+        bubble.opacity -= 0.01;
+
+        if (bubble.opacity <= 0 || bubble.y < 0) {
+          bubbles.splice(i, 1);
+          return;
+        }
+
+        ctx.fillStyle = `rgba(100, 200, 255, ${bubble.opacity})`;
+        ctx.beginPath();
+        ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawMinimap() {
+      const scale = 0.15;
+      minimapCtx.fillStyle = '#030a15';
+      minimapCtx.fillRect(0, 0, 120, 120);
+
+      minimapCtx.strokeStyle = '#00d4ff';
+      minimapCtx.lineWidth = 1;
+
+      const level = levels[currentLevel];
+      level.walls.forEach(wall => {
+        minimapCtx.fillStyle = '#2a5a7a';
+        minimapCtx.fillRect(wall.x * scale, wall.y * scale, wall.width * scale, wall.height * scale);
+      });
+
+      minimapCtx.fillStyle = '#ff6b9d';
+      minimapCtx.beginPath();
+      minimapCtx.arc(player.x * scale, player.y * scale, 3, 0, Math.PI * 2);
+      minimapCtx.fill();
+
+      minimapCtx.fillStyle = '#4a0080';
+      minimapCtx.beginPath();
+      minimapCtx.arc(evilAxolotl.x * scale, evilAxolotl.y * scale, 3, 0, Math.PI * 2);
+      minimapCtx.fill();
+
+      level.puzzles.forEach(puzzle => {
+        if (puzzle.type === 'goal') {
+          minimapCtx.fillStyle = '#00ff88';
+          minimapCtx.beginPath();
+          minimapCtx.arc((puzzle.x || 0) * scale, (puzzle.y || 0) * scale, 2, 0, Math.PI * 2);
+          minimapCtx.fill();
+        }
+      });
+
+      minimapCtx.strokeStyle = '#00d4ff';
+      minimapCtx.lineWidth = 1;
+      minimapCtx.strokeRect(0, 0, 120, 120);
+    }
+
+    // ============================================
+    // MODALS
+    // ============================================
+
+    function showIntroModal() {
+      const html = `
+        <div class="modal" id="introModal">
+          <div class="modal-content">
+            <div class="modal-title">🐟 Axolotl Escape 🐟</div>
+            <div class="modal-text">
+              You were exploring a magical pond when a powerful evil axolotl appeared and transformed you!<br><br>
+              Now you must escape through the underwater maze, recover the magical wand, and defeat the evil axolotl to return to your human form.<br><br>
+              <strong>Use WASD to move, SPACE to interact, SHIFT to dash!</strong>
+            </div>
+            <div class="modal-buttons">
+              <button class="modal-button" onclick="startGame()">Begin Adventure</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('gameCanvas').insertAdjacentHTML('beforeend', html);
+    }
+
+    function startGame() {
+      const modal = document.getElementById('introModal');
+      if (modal) modal.remove();
+      loadLevel(0);
+    }
+
+    function showWinModal() {
+      const html = `
+        <div class="modal" id="winModal">
+          <div class="modal-content">
+            <div class="modal-title">🎉 YOU ESCAPED! 🎉</div>
+            <div class="modal-text">
+              You've defeated the evil axolotl and recovered your human form!<br><br>
+              Final Time: ${Math.floor(speedrunTimer / 60).toString().padStart(2, '0')}:${(speedrunTimer % 60).toString().padStart(2, '0')}<br><br>
+              <strong>Well done, brave adventurer!</strong>
+            </div>
+            <div class="modal-buttons">
+              <button class="modal-button" onclick="location.reload()">Play Again</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('gameCanvas').insertAdjacentHTML('beforeend', html);
+    }
+
+    // ============================================
+    // GAME LOOP
+    // ============================================
+
+    function gameLoop() {
+      updatePlayerMovement();
+      player.update();
+      evilAxolotl.update();
+      updateMinions();
+      updateEnvironmentDecor();
+      checkPuzzleInteraction();
+
+      // Update interaction prompt
+      const prompt = document.getElementById('interactionPrompt');
+      if (player.canInteract && player.interactTarget) {
+        let text = 'Press SPACE';
+        if (player.interactTarget.type === 'goal') text = 'PRESS SPACE TO EXIT';
+        if (player.interactTarget.type === 'wand') text = 'PRESS SPACE TO TAKE WAND';
+        if (player.interactTarget.type === 'switch') text = 'PRESS SPACE TO TOGGLE';
+
+        prompt.textContent = text;
+        prompt.classList.remove('hidden');
+      } else {
+        prompt.classList.add('hidden');
+      }
+
+      drawLevel();
+      drawEnvironmentDecor();
+      drawMinions();
+      drawMinimap();
+      updateAbilityUI();
+      updateTimer();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    showIntroModal();
+    gameLoop();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f104843d29a5e39',t:'MTc3Njk4MzEwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
